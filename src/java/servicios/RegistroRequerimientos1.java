@@ -13,6 +13,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -32,28 +34,28 @@ public class RegistroRequerimientos1 extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        modelo.Elementos.administrador_trabajando=0;//Se asegura que el admi no este trabajando
-        int opcion, eleccion;
-        try {
-            opcion = Integer.parseInt(request.getParameter("opcionR"));
-        } catch (Exception ex) {
-            opcion = 0;
-        }
-        modelo.Elementos.id_Categoria_Requerido = 0;
-        if (opcion == 1) {
-            eleccion = Integer.parseInt(request.getParameter("categorias"));//id de categoria elegida
-            modelo.Elementos.id_Categoria_Requerido = eleccion;
-            RequestDispatcher rd;
-            rd = request.getRequestDispatcher("/ElegirSubCategoria.jsp");
-            request.setAttribute("categoria", eleccion);
-            rd.forward(request, response);
-        } else if (opcion == 2) {
-            response.sendRedirect("CrearCategoria.jsp");
-        } else {
-            response.sendRedirect("Empresa.jsp");
-            //Deberia eliminar el ultimo puesto...
-        }
+        response.setContentType("application/json;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            JSONObject obj = new JSONObject();//Crea un objeto JSON
+            JSONArray opciones = new JSONArray();//Array del Objeto JSON para provincias
+            
+            
+            for(int i = 0; i < modelo.DAO.ConjuntoCategorias.obtenerInstancia().obtenerCategorias().size(); i++){
+                JSONObject opc = new JSONObject();//Objetos JSON dentro del Array Opciones
+                opc.put("valor", modelo.DAO.ConjuntoCategorias.obtenerInstancia().obtenerCategorias().get(i).getId_categoria());
+                opc.put("texto", modelo.DAO.ConjuntoCategorias.obtenerInstancia().obtenerCategorias().get(i).getNombre_categoria());
+                opciones.put(opc);
+            }
+            
+            JSONObject nombre = new JSONObject();
+            nombre.put("valor", modelo.DAO.ConjuntoPuestos.obtenerInstancia().obtenerMayorId());
+            nombre.put("texto", modelo.DAO.ConjuntoPuestos.obtenerInstancia().obtenerMayorNombre());
 
+            
+            obj.put("opciones", opciones);
+            obj.put("nombre", nombre);
+            out.println(obj);//Representacion del objeto usando un formato JSON
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
