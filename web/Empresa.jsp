@@ -11,53 +11,51 @@
         <meta charset=UTF-8">
         <title>Empresa (Pagina Principal)</title>
         <link href="css/default.css" rel="stylesheet" type="text/css"/>
+        <link href="css/estiloBienvenida.css" rel="stylesheet" type="text/css"/>
+        <link href="css/login.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
         <div id="wrapper">
             <header></header>
+            <div id="header" style="overflow: hidden;">
+                <nav> <!-- Aqui estamos iniciando la nueva etiqueta nav -->
+                    <ul class="nav">
+                        <li><a href="Principal.jsp">Inicio</a></li>
+                        <li><a href="loginEmpresa.jsp">Empresa</a></li>
+                        <li><a href="loginOferente.jsp">Oferente</a></li>
+                        <li><a href="loginAdministrador.jsp">Administracion</a></li>
+                        <li><a href="prueba.jsp">Registros</a></li>
+                    </ul>
+                </nav><!-- Aqui estamos cerrando la nueva etiqueta nav -->
+            </div>
             <div id="contents">
-                <h1>Bienvenida Empresa!</h1>
-                <p>
-                    Para efectos de prueba, el id de su empresa es el 1
-                </p>
-                <p>
-                    Puestos de esta empresa:
-                    <%= modelo.DAO.ConjuntoPuestos.obtenerInstancia().toStringHTML_EMPRESA(1)%>
-                </p>
-                <p>
-                    Puestos totales;
-                    <%= modelo.DAO.ConjuntoPuestos.obtenerInstancia().toStringHTML()%>
-                </p>
-                <section>
-                    <form id="formulario1" action="Servicio1" method="GET">
-                        <table id="tablaFormulario">
-                            <thead>
-                                <tr>
-                                    <th colspan="2">Transacciones Posibles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="campo">
-                                        
-                                        <input type="radio" id="opcion_01" name="opcionE" value="2" />
-                                        <label for="opcion_01">Ver oferentes</label><br />
-                                        <input type="radio" id="opcion_02" name="opcionE" value="3" />
-                                        <label for="opcion_02">Agregar nuevo puesto</label><br />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="controles">
-                                        <input type="reset" value="Borrar" />
-                                        <input type="submit" value="Enviar" />
-                                    </td>
-                                </tr>
-                            </tbody>
+                <br/><br/>
+                <section class="section">
+                    <center>
+                        <h1><span>Bienvenida Empresa!</span></h1>
+                        <table width="65%" cellpadding="8">
+                            <tr>
+                                <td>
+                                    <a href="AgregarPuestos.jsp"><button class="submit">Publicar Puesto</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="prueba.jsp"><button class="submit">Buscar Candidatos</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="prueba.jsp"><button class="submit">Editar Puesto</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="prueba.jsp"><button class="submit">Puestos Registrados</button></a>
+                                </td>
+                            </tr>
                         </table>
-                    </form>
-                </section>
-                <section>
-                    <a href="Principal.jsp">Regresar</a>
+                    </center>
                 </section>
             </div>
             <footer></footer>

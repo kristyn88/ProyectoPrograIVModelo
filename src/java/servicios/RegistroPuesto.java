@@ -29,7 +29,7 @@ public class RegistroPuesto extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int idEmpresa = Integer.parseInt(request.getParameter("idEmpresa"));
+        int idEmpresa = modelo.Elementos.id_Empresa_Requerida;
         String nombre = request.getParameter("nombreP");
         String descripcion = request.getParameter("descripcionP");
         int salario = Integer.parseInt(request.getParameter("salarioP"));
