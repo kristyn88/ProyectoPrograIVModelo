@@ -94,6 +94,24 @@ public class ConjuntoPuestos implements Serializable {
         return puesto;
     }
     
+    public String obtenerMayorNombre() {
+        String puesto = "";
+        try {
+            try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+                    PreparedStatement stm = cnx.prepareStatement(CMD_ULTIMO_NOMBRE)) {
+                stm.clearParameters();
+                try (ResultSet rs = stm.executeQuery()) {
+                    if (rs.next()) {
+                        puesto = rs.getString("nombre_puesto");
+                    }
+                }
+            }     
+            return puesto;
+        } catch (SQLException ex) {
+            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+        }
+        return puesto;
+    }
 
     public List<Puesto> obtenerPuestosDeEmpresa(int num) {
         List<Puesto> puestos = new ArrayList<>();
@@ -176,6 +194,10 @@ public class ConjuntoPuestos implements Serializable {
     private static final String CMD_ULTIMO_ID
             = "SELECT id_puesto "
             + "FROM bancoempleo.puesto " + " where id_puesto = (select max(id_puesto) from puesto); ";
+    
+    private static final String CMD_ULTIMO_NOMBRE
+            = "select nombre_puesto from bancoempleo.puesto "
+            + "where id_puesto = (select max(id_puesto) from bancoempleo.puesto);";
     
     private static ConjuntoPuestos instancia = null;
 }
