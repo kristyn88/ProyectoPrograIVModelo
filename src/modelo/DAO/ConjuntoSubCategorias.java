@@ -45,31 +45,31 @@ public class ConjuntoSubCategorias implements Serializable{
             System.err.printf("Excepción: '%s'\n", ex.getMessage());
         }
     }
-    
-    public List<SubCategoria> obtenerSubCategorias(){
-        List<SubCategoria> subCategorias = new ArrayList<>();
-        try{
-            try(Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
-                    Statement stm = cnx.createStatement();
-                    ResultSet rs = stm.executeQuery(CMD_LISTAR)){
-                
-                while(rs.next()){
-                    int id_subCategoria = rs.getInt("id_subCategoria");
-                    String nombre = rs.getString("nombre_subCategoria");
-                    int categoria = rs.getInt("categoria");
-                    
-                    subCategorias.add(new SubCategoria(id_subCategoria, nombre, categoria));
-                }
-            }
-            return subCategorias;
-        }catch (SQLException ex) {
-            System.err.printf("Excepción: '%s'\n", ex.getMessage());
-        }
-        return subCategorias;
-    }
+//    
+//    public List<SubCategoria> obtenerSubCategorias(int cat){
+//        List<SubCategoria> subCategorias = new ArrayList<>();
+//        try{
+//            try(Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+//                    Statement stm = cnx.createStatement();
+//                    ResultSet rs = stm.executeQuery(CMD_LISTAR)){
+//                
+//                while(rs.next()){
+//                    int id_subCategoria = rs.getInt("id_subCategoria");
+//                    String nombre = rs.getString("nombre_subCategoria");
+//                    int categoria = rs.getInt("categoria");
+//                    
+//                    subCategorias.add(new SubCategoria(id_subCategoria, nombre, categoria));
+//                }
+//            }
+//            return subCategorias;
+//        }catch (SQLException ex) {
+//            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+//        }
+//        return subCategorias;
+//    }
     
     //Saca todas las subCategorias de una Categoria Especifica
-    public List<SubCategoria> obtenerSubCategoriaDeCategoria(int num) {
+    public List<SubCategoria> obtenerSubCategorias(int num) {
         List<SubCategoria> subCategorias = new ArrayList<>();
         try {
             try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
@@ -94,60 +94,12 @@ public class ConjuntoSubCategorias implements Serializable{
         return subCategorias;
     }
     
-    //Menu de subCategorias de una Categoria Específica
-    public static String menuSubCategoriasHTML(int Categoria) {
-        StringBuilder r = new StringBuilder();
-        for (int i = 0; i < obtenerInstancia().obtenerSubCategoriaDeCategoria(Categoria).size(); i++) {
-            r.append(String.format(
-                    "<option value=\"%d\">%s</option>",
-                    (obtenerInstancia().obtenerSubCategoriaDeCategoria(Categoria)).get(i).getId_subCategoria(),
-                    (obtenerInstancia().obtenerSubCategoriaDeCategoria(Categoria)).get(i).getNombre_subCategoria()
-            ));
-        }
-        return r.toString();
-    }
     
-    public String toStringHTML() {
-        StringBuilder r = new StringBuilder();
-        r.append("\n<table class=\"tabla\">");
-        r.append("\n<thead><tr>");
-        r.append(SubCategoria.encabezadosHTML());
-        r.append("\n</tr></thead>");
-        r.append("\n<tbody>");
-        for (SubCategoria s : obtenerSubCategorias()) {
-            r.append(String.format(
-                    "\n\t<tr>%s</tr>",
-                    s.toStringHTML())
-            );
-        }
-        r.append("\n</tbody>");
-        r.append("\n</table>");
-        return r.toString();
-    }
     
-    public int obtenerMayorId() {
-        int puesto = 0;
-        try {
-            try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
-                    PreparedStatement stm = cnx.prepareStatement(CMD_ULTIMO_ID)) {
-                stm.clearParameters();
-                try (ResultSet rs = stm.executeQuery()) {
-                    if (rs.next()) {
-                        puesto = rs.getInt("id_subCategoria");
-                    }
-                }
-            }     
-            return puesto;
-        } catch (SQLException ex) {
-            System.err.printf("Excepción: '%s'\n", ex.getMessage());
-        }
-        return puesto;
-    }
-    
-    private static final String CMD_LISTAR
-            = "SELECT id_subCategoria, nombre_subCategoria, categoria "
-            + "FROM bancoempleo.subCategoria ORDER BY id_subCategoria ASC; ";
-    
+//    private static final String CMD_LISTAR
+//            = "SELECT id_subCategoria, nombre_subCategoria, categoria "
+//            + "FROM bancoempleo.subCategoria ORDER BY id_subCategoria ASC; ";
+//    
     private static final String CMD_LISTAR_POR_CATEGORIA
             = "SELECT id_subCategoria, nombre_subCategoria, categoria "
             + "FROM bancoempleo.subCategoria " + " WHERE categoria=? "
