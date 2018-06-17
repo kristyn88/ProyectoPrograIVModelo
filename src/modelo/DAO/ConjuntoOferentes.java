@@ -1,5 +1,7 @@
 package modelo.DAO;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,12 +10,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import modelo.Oferente;
+import org.apache.commons.fileupload.FileItem;
 
-/**
- *
- * @author krist
- */
 public class ConjuntoOferentes implements Serializable {
 
     private ConjuntoOferentes() {
@@ -258,7 +259,29 @@ public class ConjuntoOferentes implements Serializable {
         }
         return r;
     }
-    
+
+    public boolean agregarCurriculum(byte[] bytes, String correo) {
+        try {
+            Connection cnx
+                    = GestorBD.obtenerInstancia().obtenerConexion();
+
+            try (PreparedStatement stm = cnx.prepareStatement(CMD_CURRICULUM)) {
+                stm.clearParameters();
+                stm.setBytes(1, bytes);
+                stm.setString(2, correo);
+
+                int resultado = stm.executeUpdate();
+                if (resultado >= 1) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.printf("Excepción: '%s'%n",
+                    ex.getMessage());
+        }
+        return false;
+    }
+
     public String toStringHTMLEspecifico(int id) {
         StringBuilder r = new StringBuilder();
         r.append("\n<table class=\"tabla\">");
@@ -274,6 +297,9 @@ public class ConjuntoOferentes implements Serializable {
         r.append("\n</table>");
         return r.toString();
     }
+
+    private static final String CMD_CURRICULUM
+            = "UPDATE oferente SET documento = ? WHERE  correo = ?;";
 
     private static final String CMD_LISTAR
             = "SELECT id_oferente, nombre_oferente, primer_apellido, nacionalidad, telefono, correo, residencia, estado,clave, usuario "
@@ -298,7 +324,7 @@ public class ConjuntoOferentes implements Serializable {
     private static final String CMD_RECUPERAR_POR_CORREO
             = "SELECT id_oferente, nombre_oferente, primer_apellido, nacionalidad, telefono, correo, residencia, estado, clave, usuario "
             + "FROM bancoempleo.oferente WHERE correo=?; ";
-    
+
     private static final String CMD_RECUPERAR
             = "SELECT id_oferente, nombre_oferente, primer_apellido, nacionalidad, telefono, correo, residencia, estado, clave, usuario "
             + "FROM bancoempleo.oferente WHERE id_oferente=?; ";

@@ -46,27 +46,27 @@ public class ConjuntoSubCategorias implements Serializable{
         }
     }
 //    
-//    public List<SubCategoria> obtenerSubCategorias(int cat){
-//        List<SubCategoria> subCategorias = new ArrayList<>();
-//        try{
-//            try(Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
-//                    Statement stm = cnx.createStatement();
-//                    ResultSet rs = stm.executeQuery(CMD_LISTAR)){
-//                
-//                while(rs.next()){
-//                    int id_subCategoria = rs.getInt("id_subCategoria");
-//                    String nombre = rs.getString("nombre_subCategoria");
-//                    int categoria = rs.getInt("categoria");
-//                    
-//                    subCategorias.add(new SubCategoria(id_subCategoria, nombre, categoria));
-//                }
-//            }
-//            return subCategorias;
-//        }catch (SQLException ex) {
-//            System.err.printf("Excepción: '%s'\n", ex.getMessage());
-//        }
-//        return subCategorias;
-//    }
+    public List<SubCategoria> obtenerTodasSubCategorias(){
+        List<SubCategoria> subCategorias = new ArrayList<>();
+        try{
+            try(Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+                    Statement stm = cnx.createStatement();
+                    ResultSet rs = stm.executeQuery(CMD_LISTAR)){
+                
+                while(rs.next()){
+                    int id_subCategoria = rs.getInt("id_subCategoria");
+                    String nombre = rs.getString("nombre_subCategoria");
+                    int categoria = rs.getInt("categoria");
+                    
+                    subCategorias.add(new SubCategoria(id_subCategoria, nombre, categoria));
+                }
+            }
+            return subCategorias;
+        }catch (SQLException ex) {
+            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+        }
+        return subCategorias;
+    }
     
     //Saca todas las subCategorias de una Categoria Especifica
     public List<SubCategoria> obtenerSubCategorias(int num) {
@@ -95,11 +95,28 @@ public class ConjuntoSubCategorias implements Serializable{
     }
     
     
+    public String toStringHTML() {
+        StringBuilder r = new StringBuilder();
+        r.append("\n<table class=\"tabla\">");
+        r.append("\n<thead><tr>");
+        r.append(SubCategoria.encabezadosHTML());
+        r.append("\n</tr></thead>");
+        r.append("\n<tbody>");
+        for (SubCategoria s : obtenerTodasSubCategorias()) {
+            r.append(String.format(
+                    "\n\t<tr>%s</tr>",
+                    s.toStringHTML())
+            );
+        }
+        r.append("\n</tbody>");
+        r.append("\n</table>");
+        return r.toString();
+    }
     
-//    private static final String CMD_LISTAR
-//            = "SELECT id_subCategoria, nombre_subCategoria, categoria "
-//            + "FROM bancoempleo.subCategoria ORDER BY id_subCategoria ASC; ";
-//    
+    private static final String CMD_LISTAR
+            = "SELECT id_subCategoria, nombre_subCategoria, categoria "
+            + "FROM bancoempleo.subCategoria ORDER BY id_subCategoria ASC; ";
+    
     private static final String CMD_LISTAR_POR_CATEGORIA
             = "SELECT id_subCategoria, nombre_subCategoria, categoria "
             + "FROM bancoempleo.subCategoria " + " WHERE categoria=? "
