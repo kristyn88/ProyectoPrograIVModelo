@@ -50,12 +50,54 @@ public class ConjuntoPuestos implements Serializable {
         }
     }
 
+    public void desactivarPuesto(int idPuesto) {
+        try {
+            try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+                    PreparedStatement stm = cnx.prepareCall(CMD_DESACTIVAR_PUESTO)) {
+                stm.clearParameters();
+                stm.setInt(1, idPuesto);
+                if (stm.executeUpdate() != 1) {
+                    throw new Exception(String.format(
+                            "No puede agregar el resgistro de puesto: (%s)",
+                            idPuesto));
+                }
+            }
+        } catch (Exception ex) {
+            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+        }
+    }
+    
     public List<Puesto> obtenerPuestos() {
         List<Puesto> puestos = new ArrayList<>();
         try {
             try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
                     Statement stm = cnx.createStatement();
                     ResultSet rs = stm.executeQuery(CMD_LISTAR)) {
+
+                while (rs.next()) {
+                    int id_puesto = rs.getInt("id_puesto");
+                    String nombre = rs.getString("nombre_puesto");
+                    String descripcion = rs.getString("descripcion");
+                    int salario = rs.getInt("salario_ofrecido");
+                    int tipo = rs.getInt("tipo_publicacion");
+                    int estado = rs.getInt("estado_publicacion");
+                    int empresa = rs.getInt("empresa");
+                    puestos.add(new Puesto(id_puesto, nombre, descripcion, salario, tipo, estado, empresa));
+                }
+            }
+            return puestos;
+        } catch (SQLException ex) {
+            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+        }
+        return puestos;
+    }
+    
+    public List<Puesto> obtenerUltimos5Puestos() {
+        List<Puesto> puestos = new ArrayList<>();
+        try {
+            try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+                    Statement stm = cnx.createStatement();
+                    ResultSet rs = stm.executeQuery(CMD_LISTAR_ULTIMOS_CINCO)) {
 
                 while (rs.next()) {
                     int id_puesto = rs.getInt("id_puesto");
@@ -141,6 +183,35 @@ public class ConjuntoPuestos implements Serializable {
         return puestos;
     }
 
+    
+    public List<Puesto> obtenerPuestosPorDetalle(int num) {
+        List<Puesto> puestos = new ArrayList<>();
+        try {
+            try (Connection cnx = GestorBD.obtenerInstancia().obtenerConexion();
+                    PreparedStatement stm = cnx.prepareStatement(CMD_LISTAR_POR_EMPRESA)) {
+                stm.clearParameters();
+                stm.setInt(1, num);
+                try (ResultSet rs = stm.executeQuery()) {
+
+                    while (rs.next()) {
+                        int id_puesto = rs.getInt("id_puesto");
+                        String nombre = rs.getString("nombre_puesto");
+                        String descripcion = rs.getString("descripcion");
+                        int salario = rs.getInt("salario_ofrecido");
+                        int tipo = rs.getInt("tipo_publicacion");
+                        int estado = rs.getInt("estado_publicacion");
+                        int empresa = rs.getInt("empresa");
+                        puestos.add(new Puesto(id_puesto, nombre, descripcion, salario, tipo, estado, empresa));
+                    }
+                }
+            }
+            return puestos;
+        } catch (SQLException ex) {
+            System.err.printf("Excepción: '%s'\n", ex.getMessage());
+        }
+        return puestos;
+    }
+    
     public String toStringHTML() {
         StringBuilder r = new StringBuilder();
         r.append("\n<table class=\"tabla\">");
@@ -180,6 +251,11 @@ public class ConjuntoPuestos implements Serializable {
     private static final String CMD_LISTAR
             = "SELECT id_puesto, nombre_puesto, descripcion, salario_ofrecido, tipo_publicacion, estado_publicacion, empresa "
             + "FROM bancoempleo.puesto ORDER BY id_puesto ASC; ";
+    
+    private static final String CMD_LISTAR_ULTIMOS_CINCO
+            = "SELECT id_puesto, nombre_puesto, descripcion, salario_ofrecido, tipo_publicacion, estado_publicacion, empresa "
+            + "FROM bancoempleo.puesto WHERE bancoempleo.puesto.tipo_publicacion = 0 \n" +
+                "group by bancoempleo.puesto.id_puesto desc limit 5; ";
 
     private static final String CMD_LISTAR_POR_EMPRESA
             = "SELECT id_puesto, nombre_puesto, descripcion, salario_ofrecido, tipo_publicacion, estado_publicacion, empresa "
@@ -191,6 +267,9 @@ public class ConjuntoPuestos implements Serializable {
             + "(id_puesto, nombre_puesto, descripcion, salario_ofrecido, tipo_publicacion, estado_publicacion, empresa) "
             + "VALUES(?, ?, ?, ?, ?, ?, ?); ";
 
+    private static final String CMD_DESACTIVAR_PUESTO
+            = "update bancoempleo.puesto set estado_publicacion = 1 where puesto.id_puesto = ?; ";
+   
     private static final String CMD_ULTIMO_ID
             = "SELECT id_puesto "
             + "FROM bancoempleo.puesto " + " where id_puesto = (select max(id_puesto) from puesto); ";
@@ -198,6 +277,12 @@ public class ConjuntoPuestos implements Serializable {
     private static final String CMD_ULTIMO_NOMBRE
             = "select nombre_puesto from bancoempleo.puesto "
             + "where id_puesto = (select max(id_puesto) from bancoempleo.puesto);";
+    
+    private static final String CMD_DETALLE
+            = "select puesto.nombre_puesto, puesto.descripcion, puesto.salario_ofrecido, empresa.nombre_empresa, empresa.telefono" +
+                "from puesto, empresa " +
+                "where puesto.empresa = empresa.id_empresa; ";
+    
     
     private static ConjuntoPuestos instancia = null;
 }
